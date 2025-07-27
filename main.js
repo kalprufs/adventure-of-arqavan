@@ -18,39 +18,54 @@ const config = {
         speed: 4, // Character speed
         jumpPower: 10,
         gravity: 0.5,
-        walkAnimationSpeed: 0.05 // Speed of walking animation (reduced for smoother animation)
+        walkAnimationSpeed: 0.05, // Speed of walking animation (reduced for smoother animation)
+        // Assuming melika assets are 1024x1024 images, but the actual character is smaller
+        // Let's assume the character itself takes up a 512x512 area within the 1024x1024 image, centered.
+        sourceFrameWidth: 512,
+        sourceFrameHeight: 512,
+        sourceOffsetX: (1024 - 512) / 2, // Center the 512x512 within 1024x1024
+        sourceOffsetY: (1024 - 512) / 2,
     },
     elahe: {
         x: 520, y: 255, width: 200, height: 200, // Rendered size
-        spriteSheetWidth: 1024, // Actual width of elahe.png
-        spriteSheetHeight: 1024, // Actual height of elahe.png
-        frameCount: 2, // Number of frames in sheet (assuming vertical stack)
+        frameWidth: 1024,  // Actual width of ONE frame
+        frameHeight: 512,  // Actual height of ONE frame (assuming 1024x1024 image with 2 vertical frames)
+        frameCount: 2,     // Number of frames in the sheet
+        frameDirection: 'vertical', // 'vertical' or 'horizontal'
         animationSpeed: 0.05 // Speed of animation (reduced)
     },
     mahsa: {
         x: 320, y: 248, width: 200, height: 200, // Rendered size
-        spriteSheetWidth: 1024,
-        spriteSheetHeight: 1024,
+        frameWidth: 1024,
+        frameHeight: 512,
         frameCount: 2,
+        frameDirection: 'vertical',
         animationSpeed: 0.05
     },
     sohrab: {
         x: 700, y: 261, width: 181, height: 181, // Rendered size
-        spriteSheetWidth: 1024,
-        spriteSheetHeight: 1024,
+        frameWidth: 1024,
+        frameHeight: 512,
         frameCount: 2,
+        frameDirection: 'vertical',
         animationSpeed: 0.05
     },
     spaceHint: {
         x: 400, y: 100, width: 100, height: 100, // Rendered size
-        spriteSheetWidth: 1024, // Actual width of space.png
-        spriteSheetHeight: 1024, // Actual height of space.png
-        frameCount: 2, // Number of frames in sheet (assuming vertical stack)
-        animationSpeed: 0.05 // Speed of animation (reduced)
+        frameWidth: 1024,
+        frameHeight: 512,
+        frameCount: 2,
+        frameDirection: 'vertical',
+        animationSpeed: 0.05
     },
     object: {
-        width: 40,
-        height: 40
+        width: 40,  // Rendered width
+        height: 40, // Rendered height
+        // Assuming object.png is also a large image (e.g., 1024x1024) with the actual object being smaller and centered.
+        sourceFrameWidth: 100, // Make a guess for a smaller source frame
+        sourceFrameHeight: 100,
+        sourceOffsetX: (1024 - 100) / 2,
+        sourceOffsetY: (1024 - 100) / 2,
     }
 };
 
@@ -485,22 +500,37 @@ function render() {
 
     // Draw NPCs
     // Elahe
-    const elaheFrameHeight = config.elahe.spriteSheetHeight / config.elahe.frameCount;
-    const elaheSourceY = Math.floor(game.npcs.elahe.currentFrame) * elaheFrameHeight;
+    let elaheSourceX = 0;
+    let elaheSourceY = 0;
+    if (config.elahe.frameDirection === 'vertical') {
+        elaheSourceY = Math.floor(game.npcs.elahe.currentFrame) * config.elahe.frameHeight;
+    } else { // horizontal
+        elaheSourceX = Math.floor(game.npcs.elahe.currentFrame) * config.elahe.frameWidth;
+    }
     drawSprite(game.assets.elahe, config.elahe.x, config.elahe.y, config.elahe.width, config.elahe.height,
-               0, elaheSourceY, config.elahe.spriteSheetWidth, elaheFrameHeight);
+               elaheSourceX, elaheSourceY, config.elahe.frameWidth, config.elahe.frameHeight);
 
     // Mahsa
-    const mahsaFrameHeight = config.mahsa.spriteSheetHeight / config.mahsa.frameCount;
-    const mahsaSourceY = Math.floor(game.npcs.mahsa.currentFrame) * mahsaFrameHeight;
+    let mahsaSourceX = 0;
+    let mahsaSourceY = 0;
+    if (config.mahsa.frameDirection === 'vertical') {
+        mahsaSourceY = Math.floor(game.npcs.mahsa.currentFrame) * config.mahsa.frameHeight;
+    } else {
+        mahsaSourceX = Math.floor(game.npcs.mahsa.currentFrame) * config.mahsa.frameWidth;
+    }
     drawSprite(game.assets.mahsa, config.mahsa.x, config.mahsa.y, config.mahsa.width, config.mahsa.height,
-               0, mahsaSourceY, config.mahsa.spriteSheetWidth, mahsaFrameHeight);
+               mahsaSourceX, mahsaSourceY, config.mahsa.frameWidth, config.mahsa.frameHeight);
 
     // Sohrab
-    const sohrabFrameHeight = config.sohrab.spriteSheetHeight / config.sohrab.frameCount;
-    const sohrabSourceY = Math.floor(game.npcs.sohrab.currentFrame) * sohrabFrameHeight;
+    let sohrabSourceX = 0;
+    let sohrabSourceY = 0;
+    if (config.sohrab.frameDirection === 'vertical') {
+        sohrabSourceY = Math.floor(game.npcs.sohrab.currentFrame) * config.sohrab.frameHeight;
+    } else {
+        sohrabSourceX = Math.floor(game.npcs.sohrab.currentFrame) * config.sohrab.frameWidth;
+    }
     drawSprite(game.assets.sohrab, config.sohrab.x, config.sohrab.y, config.sohrab.width, config.sohrab.height,
-               0, sohrabSourceY, config.sohrab.spriteSheetWidth, sohrabFrameHeight);
+               sohrabSourceX, sohrabSourceY, config.sohrab.frameWidth, config.sohrab.frameHeight);
 
 
     // Draw Character
@@ -512,23 +542,34 @@ function render() {
     } else if (game.character.direction === 'up') {
         characterSprite = game.assets.melikaup;
     }
-    // Assuming melika, melikaleft, etc. are full images for each state, not sprite sheets
-    drawSprite(characterSprite, game.character.x, game.character.y, game.character.width, game.character.height);
+    // Draw character using source offsets and frame dimensions
+    drawSprite(characterSprite,
+               game.character.x, game.character.y,
+               config.character.width, config.character.height,
+               config.character.sourceOffsetX, config.character.sourceOffsetY,
+               config.character.sourceFrameWidth, config.character.sourceFrameHeight);
 
 
     // Draw collected items
     game.items.forEach(item => {
         if (!item.collected && game.assets.object && game.assets.object.complete) {
-            drawSprite(game.assets.object, item.x, item.y, config.object.width, config.object.height);
+            drawSprite(game.assets.object, item.x, item.y, config.object.width, config.object.height,
+                       config.object.sourceOffsetX, config.object.sourceOffsetY,
+                       config.object.sourceFrameWidth, config.object.sourceFrameHeight);
         }
     });
 
     // Draw Space Hint (if active)
     if (game.spaceHintActive && game.assets.space && game.assets.space.complete) {
-        const spaceHintFrameHeight = config.spaceHint.spriteSheetHeight / config.spaceHint.frameCount;
-        const spaceHintSourceY = game.spaceHintCurrentFrame * spaceHintFrameHeight;
+        let spaceHintSourceX = 0;
+        let spaceHintSourceY = 0;
+        if (config.spaceHint.frameDirection === 'vertical') {
+            spaceHintSourceY = Math.floor(game.spaceHintCurrentFrame) * config.spaceHint.frameHeight;
+        } else {
+            spaceHintSourceX = Math.floor(game.spaceHintCurrentFrame) * config.spaceHint.frameWidth;
+        }
         drawSprite(game.assets.space, config.spaceHint.x, config.spaceHint.y, config.spaceHint.width, config.spaceHint.height,
-                   0, spaceHintSourceY, config.spaceHint.spriteSheetWidth, spaceHintFrameHeight);
+                   spaceHintSourceX, spaceHintSourceY, config.spaceHint.frameWidth, config.spaceHint.frameHeight);
     }
 
     // Draw dialogue box (if active, assuming it's a DOM element, not drawn on canvas)
