@@ -22,10 +22,10 @@ const config = {
         frameCount: 2, // Assuming 2 frames per animation (e.g., for walking left/right)
         spriteSheetWidth: 1024, // Assuming the character sprite sheets (melikaleft, melikaright etc.) are 1024x2048
         spriteSheetHeight: 2048, // Corrected from 1024 to 2048 for 2 vertical frames
-        sourceFrameWidth: 512, // Assuming the actual sprite within each 1024x1024 frame is 512x512
-        sourceFrameHeight: 512, // Assuming the actual sprite within each 1024x1024 frame is 512x512
-        sourceOffsetX: (1024 - 512) / 2, // Center the 512px wide sprite in the 1024px frame
-        sourceOffsetY: 0, // No vertical offset within its individual frame (adjusted by sourceY)
+        sourceFrameWidth: 200, // Assuming actual sprite content is 200x200 within its frame
+        sourceFrameHeight: 200, // Assuming actual sprite content is 200x200 within its frame
+        sourceOffsetX: (1024 - 200) / 2, // Center the 200px wide sprite in the 1024px frame
+        sourceOffsetY: (1024 - 200) / 2, // Center the 200px high sprite in the 1024px frame
     },
     elahe: {
         x: 520, y: 255, width: 200, height: 200, // Rendered size
@@ -33,10 +33,10 @@ const config = {
         spriteSheetWidth: 1024, // Full width of elahe.png
         spriteSheetHeight: 2048, // Corrected from 1024 to 2048 for 2 vertical frames
         animationSpeed: 2,
-        sourceFrameWidth: 512, // Actual width of the visible sprite within its 1024x1024 frame
-        sourceFrameHeight: 512, // Actual height of the visible sprite within its 1024x1024 frame
-        sourceOffsetX: (1024 - 512) / 2, // Offset to center the sprite horizontally within its 1024px frame
-        sourceOffsetY: 0, // No specific vertical offset within its individual frame (handled by frame selection)
+        sourceFrameWidth: 200, // Actual width of the visible sprite within its 1024x1024 frame
+        sourceFrameHeight: 200, // Actual height of the visible sprite within its 1024x1024 frame
+        sourceOffsetX: (1024 - 200) / 2, // Offset to center the sprite horizontally within its 1024px frame
+        sourceOffsetY: (1024 - 200) / 2, // Offset to center the sprite vertically within its 1024px frame
     },
     mahsa: {
         x: 320, y: 248, width: 200, height: 200, // Rendered size
@@ -44,10 +44,10 @@ const config = {
         spriteSheetWidth: 1024,
         spriteSheetHeight: 2048, // Corrected from 1024 to 2048
         animationSpeed: 2,
-        sourceFrameWidth: 512,
-        sourceFrameHeight: 512,
-        sourceOffsetX: (1024 - 512) / 2,
-        sourceOffsetY: 0,
+        sourceFrameWidth: 200,
+        sourceFrameHeight: 200,
+        sourceOffsetX: (1024 - 200) / 2,
+        sourceOffsetY: (1024 - 200) / 2,
     },
     sohrab: {
         x: 700, y: 261, width: 181, height: 181, // Rendered size
@@ -55,10 +55,10 @@ const config = {
         spriteSheetWidth: 1024,
         spriteSheetHeight: 2048, // Corrected from 1024 to 2048
         animationSpeed: 2,
-        sourceFrameWidth: 512,
-        sourceFrameHeight: 512,
-        sourceOffsetX: (1024 - 512) / 2,
-        sourceOffsetY: 0,
+        sourceFrameWidth: 181, // Use its own rendered width
+        sourceFrameHeight: 181, // Use its own rendered height
+        sourceOffsetX: (1024 - 181) / 2, // Center its own width
+        sourceOffsetY: (1024 - 181) / 2, // Center its own height
     },
     spaceHint: {
         x: 400, y: 100, width: 100, height: 100, // Rendered size
@@ -66,10 +66,10 @@ const config = {
         spriteSheetWidth: 1024, // Full width of space.png
         spriteSheetHeight: 2048, // Corrected from 1024 to 2048
         animationSpeed: 2,
-        sourceFrameWidth: 512, // Actual width of the visible sprite within its 1024x1024 frame
-        sourceFrameHeight: 512,
-        sourceOffsetX: (1024 - 512) / 2, // Offset to center the sprite horizontally
-        sourceOffsetY: 0,
+        sourceFrameWidth: 100, // Actual width of the visible sprite within its 1024x1024 frame
+        sourceFrameHeight: 100,
+        sourceOffsetX: (1024 - 100) / 2, // Offset to center the sprite horizontally
+        sourceOffsetY: (1024 - 100) / 2, // Offset to center the sprite vertically
     },
     object: {
         width: 40,  // Rendered width
