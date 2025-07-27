@@ -11,54 +11,42 @@ const config = {
         height: 512
     },
     character: {
-        width: 200,
-        height: 200,
+        width: 200, // Rendered width on canvas
+        height: 200, // Rendered height on canvas
         startX: 10,
         startY: 285,
         speed: 4, // Character speed
         jumpPower: 10,
         gravity: 0.5,
-        walkAnimationSpeed: 0.2 // Speed of walking animation
+        walkAnimationSpeed: 0.05 // Speed of walking animation (reduced for smoother animation)
     },
     elahe: {
-        x: 520,
-        y: 255,
-        width: 200,
-        height: 200,
-        frameCount: 2, // Number of frames in the sprite sheet
-        frameWidth: 1024, // Width of the entire sprite sheet
-        frameHeight: 1024, // Height of the entire sprite sheet
-        animationSpeed: 0.2 // Speed of animation
+        x: 520, y: 255, width: 200, height: 200, // Rendered size
+        spriteSheetWidth: 1024, // Actual width of elahe.png
+        spriteSheetHeight: 1024, // Actual height of elahe.png
+        frameCount: 2, // Number of frames in sheet (assuming vertical stack)
+        animationSpeed: 0.05 // Speed of animation (reduced)
     },
     mahsa: {
-        x: 320,
-        y: 248,
-        width: 200,
-        height: 200,
+        x: 320, y: 248, width: 200, height: 200, // Rendered size
+        spriteSheetWidth: 1024,
+        spriteSheetHeight: 1024,
         frameCount: 2,
-        frameWidth: 1024,
-        frameHeight: 1024,
-        animationSpeed: 0.2
+        animationSpeed: 0.05
     },
     sohrab: {
-        x: 700,
-        y: 261,
-        width: 181,
-        height: 181,
+        x: 700, y: 261, width: 181, height: 181, // Rendered size
+        spriteSheetWidth: 1024,
+        spriteSheetHeight: 1024,
         frameCount: 2,
-        frameWidth: 1024,
-        frameHeight: 1024,
-        animationSpeed: 0.2
+        animationSpeed: 0.05
     },
     spaceHint: {
-        x: 400, // Position on canvas
-        y: 100, // Position on canvas
-        width: 100, // Rendered width
-        height: 100, // Rendered height
-        frameCount: 2, // Number of frames in sprite sheet
-        frameWidth: 1024, // Width of entire sprite sheet
-        frameHeight: 1024, // Height of entire sprite sheet
-        animationSpeed: 0.1 // Speed of animation
+        x: 400, y: 100, width: 100, height: 100, // Rendered size
+        spriteSheetWidth: 1024, // Actual width of space.png
+        spriteSheetHeight: 1024, // Actual height of space.png
+        frameCount: 2, // Number of frames in sheet (assuming vertical stack)
+        animationSpeed: 0.05 // Speed of animation (reduced)
     },
     object: {
         width: 40,
@@ -93,7 +81,7 @@ const game = {
         isJumping: false,
         yVelocity: 0,
         direction: 'idle', // 'idle', 'left', 'right', 'up'
-        animationFrame: 0, // Current animation frame for walking
+        animationFrame: 0, // Current animation frame for walking (if used for individual images)
         lastFrameTime: 0,
     },
     npcs: {
@@ -350,7 +338,6 @@ async function startSceneTransition(sceneFileName) {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Cleanup current scene assets/listeners if necessary (add dispose logic to scenes)
-    // For main scene, we just clean up current music and global listeners (if main.js had scene-specific listeners)
     window.removeEventListener('keydown', handleKeyDown);
     window.removeEventListener('keyup', handleKeyUp);
 
@@ -371,6 +358,13 @@ async function startSceneTransition(sceneFileName) {
         setupInput(); // Re-enable input
         startBackgroundMusic(); // Restart music
     }
+}
+
+// Generic Drawing function
+// This function can draw a full image or a specific frame from a sprite sheet.
+function drawSprite(asset, x, y, width, height, sourceX = 0, sourceY = 0, sourceWidth = asset.width, sourceHeight = asset.height) {
+    if (!asset || !asset.complete) { return; }
+    ctx.drawImage(asset, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
 }
 
 
@@ -419,17 +413,19 @@ function update(timestamp) {
     }
 
     // Update animations
-    // Character walking animation
+    // Character walking animation (animationFrame is still updated, but only changes sprite for melikaleft/right)
     if (game.character.isMoving && !game.character.isJumping) {
-        game.character.animationFrame = (game.character.animationFrame + config.character.walkAnimationSpeed) % 2; // Assuming 2 frames for walk cycle
+        game.character.animationFrame = (game.character.animationFrame + config.character.walkAnimationSpeed) % 2; // Assuming 2 frames for walk cycle, or just 0/1 for direction change
     } else {
         game.character.animationFrame = 0; // Reset to first frame when idle or jumping
     }
 
     // NPC animations
-    [game.npcs.elahe, game.npcs.mahsa, game.npcs.sohrab].forEach(npc => {
-        npc.currentFrame = (npc.currentFrame + config.elahe.animationSpeed) % config.elahe.frameCount;
+    [game.npcs.elahe, game.npcs.mahsa, game.npcs.sohrab].forEach((npc, index) => {
+        const npcConfig = (index === 0) ? config.elahe : (index === 1) ? config.mahsa : config.sohrab;
+        npc.currentFrame = (npc.currentFrame + npcConfig.animationSpeed) % npcConfig.frameCount;
     });
+
 
     // Space Hint animation
     game.spaceHintLastFrameTime += delta;
@@ -441,7 +437,7 @@ function update(timestamp) {
 
     // Check for NPC interaction proximity
     const characterCenterX = game.character.x + game.character.width / 2;
-    const characterCenterY = game.character.y + game.character.height / 2;
+    // const characterCenterY = game.character.y + game.character.height / 2; // Not used for this proximity check
 
     game.spaceHintActive = false; // Reset space hint
     if (Math.abs(characterCenterX - (game.npcs.elahe.x + config.elahe.width / 2)) < 100 && !game.npcs.elahe.dialogueTriggered) {
@@ -470,43 +466,9 @@ function update(timestamp) {
 }
 
 // Drawing functions
-function drawSprite(asset, animConfig, isCharacter = false) {
-    if (!asset || !asset.complete) {
-        // console.warn(`Asset not loaded: ${asset ? asset.src : 'undefined'}`);
-        return; // Don't draw if asset isn't loaded
-    }
-
-    let frameX = 0;
-    let frameY = 0;
-
-    if (isCharacter) {
-        // Character's sprites are assumed to be side-by-side frames for walk cycles
-        frameX = Math.floor(game.character.animationFrame) * animConfig.frameWidth; // Use character's animation frame
-        // For Melika's sprite sheet, if it's a single row, frameY is 0. If it has multiple rows for different directions, this needs adjustment.
-        // Assuming a single row sprite sheet for melika_idle, melika_right, melika_left
-    } else {
-        // NPCs or SpaceHint might have vertical frames or simple 2-frame sheets
-        frameY = Math.floor(animConfig.currentFrame) * animConfig.frameHeight;
-    }
-
-    ctx.drawImage(
-        asset,
-        frameX,
-        frameY,
-        animConfig.frameWidth,
-        animConfig.frameHeight,
-        animConfig.x,
-        animConfig.y,
-        animConfig.width, // Rendered width
-        animConfig.height // Rendered height
-    );
-}
-
-
 function render() {
     if (game.transitioning) {
-        // Only draw fade overlay if transitioning
-        return;
+        return; // Only draw fade overlay if transitioning
     }
 
     // Clear canvas
@@ -514,7 +476,7 @@ function render() {
 
     // Draw background
     if (game.assets.background && game.assets.background.complete) {
-        ctx.drawImage(game.assets.background, 0, 0, canvas.width, canvas.height);
+        drawSprite(game.assets.background, 0, 0, canvas.width, canvas.height);
     } else {
         // Fallback for background if not loaded
         ctx.fillStyle = 'lightblue';
@@ -522,9 +484,24 @@ function render() {
     }
 
     // Draw NPCs
-    drawSprite(game.assets.elahe, { ...config.elahe, currentFrame: game.npcs.elahe.currentFrame });
-    drawSprite(game.assets.mahsa, { ...config.mahsa, currentFrame: game.npcs.mahsa.currentFrame });
-    drawSprite(game.assets.sohrab, { ...config.sohrab, currentFrame: game.npcs.sohrab.currentFrame });
+    // Elahe
+    const elaheFrameHeight = config.elahe.spriteSheetHeight / config.elahe.frameCount;
+    const elaheSourceY = Math.floor(game.npcs.elahe.currentFrame) * elaheFrameHeight;
+    drawSprite(game.assets.elahe, config.elahe.x, config.elahe.y, config.elahe.width, config.elahe.height,
+               0, elaheSourceY, config.elahe.spriteSheetWidth, elaheFrameHeight);
+
+    // Mahsa
+    const mahsaFrameHeight = config.mahsa.spriteSheetHeight / config.mahsa.frameCount;
+    const mahsaSourceY = Math.floor(game.npcs.mahsa.currentFrame) * mahsaFrameHeight;
+    drawSprite(game.assets.mahsa, config.mahsa.x, config.mahsa.y, config.mahsa.width, config.mahsa.height,
+               0, mahsaSourceY, config.mahsa.spriteSheetWidth, mahsaFrameHeight);
+
+    // Sohrab
+    const sohrabFrameHeight = config.sohrab.spriteSheetHeight / config.sohrab.frameCount;
+    const sohrabSourceY = Math.floor(game.npcs.sohrab.currentFrame) * sohrabFrameHeight;
+    drawSprite(game.assets.sohrab, config.sohrab.x, config.sohrab.y, config.sohrab.width, config.sohrab.height,
+               0, sohrabSourceY, config.sohrab.spriteSheetWidth, sohrabFrameHeight);
+
 
     // Draw Character
     let characterSprite = game.assets.melika; // Default to idle
@@ -535,49 +512,27 @@ function render() {
     } else if (game.character.direction === 'up') {
         characterSprite = game.assets.melikaup;
     }
-
-    drawSprite(characterSprite, {
-        x: game.character.x,
-        y: game.character.y,
-        width: game.character.width,
-        height: game.character.height,
-        frameWidth: config.character.width, // Assuming one frame for simplicity or a consistent frame size
-        frameHeight: config.character.height, // Assuming one frame for simplicity
-        animationFrame: game.character.animationFrame
-    }, true);
+    // Assuming melika, melikaleft, etc. are full images for each state, not sprite sheets
+    drawSprite(characterSprite, game.character.x, game.character.y, game.character.width, game.character.height);
 
 
     // Draw collected items
     game.items.forEach(item => {
         if (!item.collected && game.assets.object && game.assets.object.complete) {
-            ctx.drawImage(game.assets.object, item.x, item.y, config.object.width, config.object.height);
+            drawSprite(game.assets.object, item.x, item.y, config.object.width, config.object.height);
         }
     });
 
     // Draw Space Hint (if active)
     if (game.spaceHintActive && game.assets.space && game.assets.space.complete) {
-        const spaceHintFrameX = 0; // Assuming horizontal frames for spaceHint if multiple
-        const spaceHintFrameY = game.spaceHintCurrentFrame * config.spaceHint.frameHeight;
-        ctx.drawImage(
-            game.assets.space,
-            spaceHintFrameX,
-            spaceHintFrameY,
-            config.spaceHint.frameWidth,
-            config.spaceHint.frameHeight,
-            config.spaceHint.x,
-            config.spaceHint.y,
-            config.spaceHint.width,
-            config.spaceHint.height
-        );
+        const spaceHintFrameHeight = config.spaceHint.spriteSheetHeight / config.spaceHint.frameCount;
+        const spaceHintSourceY = game.spaceHintCurrentFrame * spaceHintFrameHeight;
+        drawSprite(game.assets.space, config.spaceHint.x, config.spaceHint.y, config.spaceHint.width, config.spaceHint.height,
+                   0, spaceHintSourceY, config.spaceHint.spriteSheetWidth, spaceHintFrameHeight);
     }
 
-    // Draw dialogue box
-    if (game.dialogue.active && game.assets.dialogue && game.assets.dialogue.complete) {
-        // Position the dialogue box relative to dialogContainer div
-        // The div itself will handle positioning, just draw the image if needed over canvas
-        // If the dialogue box is a DOM element, we don't draw it on canvas.
-        // Assuming it's a DOM element, no canvas draw here.
-    }
+    // Draw dialogue box (if active, assuming it's a DOM element, not drawn on canvas)
+    // The dialogContainer div handles its own display based on game.dialogue.active
 }
 
 
@@ -621,7 +576,6 @@ function handleKeyDown(e) {
                 } else if (game.spaceHintActive) {
                     // Check interaction with NPCs
                     const characterCenterX = game.character.x + game.character.width / 2;
-                    const characterCenterY = game.character.y + game.character.height / 2;
 
                     if (Math.abs(characterCenterX - (game.npcs.elahe.x + config.elahe.width / 2)) < 100 && !game.npcs.elahe.dialogueTriggered) {
                         startDialogue(dialogues.elahe[0].speaker, dialogues.elahe);
@@ -693,7 +647,6 @@ function gameLoop(timestamp) {
 async function initGame() {
     try {
         await loadAssets();
-        // initItems(); // No longer needed here if items are managed by scenes
         setupInput();
         startBackgroundMusic(); // This will try to play, but might fail due to gesture requirement
 
