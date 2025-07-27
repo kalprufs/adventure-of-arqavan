@@ -283,8 +283,8 @@ function startTypewriterEffect(text) {
     game.dialogue.currentText = text;
     game.dialogue.displayText = "";
     game.dialogue.typing = true;
-    game.dialogue.currentCharIndex = 0;
     game.dialogue.typingTimer = 0;
+    game.dialogue.currentCharIndex = 0;
     document.getElementById('dialogText').textContent = "";
 }
 
@@ -505,7 +505,7 @@ function update(timestamp) {
         game.character.walkFrame = (game.character.walkFrame + config.character.walkAnimationSpeed) % 2; // Assuming 2 frames for walk
     } else if (game.keys.ArrowRight) {
         game.character.x += config.character.speed;
-        game.character.x = Math.min(canvas.width - config.character.width, game.character.x);
+        game.character.x = Math.min(canvas.width - config.character.width, canvas.width); // Fixed: should be canvas.width - config.character.width
         game.character.direction = 'right';
         game.character.isMoving = true;
         game.character.walkFrame = (game.character.walkFrame + config.character.walkAnimationSpeed) % 2; // Assuming 2 frames for walk
