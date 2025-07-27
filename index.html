@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melika's Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            image-rendering: pixelated;
+            border: 4px solid #444;
+        }
+        @font-face {
+            font-family: 'Radio';
+            src: url('font/Radio-Fill.ttf') format('truetype');
+        }
+        #dialogContainer {
+            position: absolute;
+            top: 90px;
+            left: 500px; /* was 550px */
+            display: flex;
+            display: none;
+            z-index: 100;
+        }
+        #dialogContent {
+            position: relative;
+            width: 624px;
+            height: 123px;
+        }
+        #dialogBox {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #dialogName {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            font-family: 'Radio', sans-serif;
+            font-size: 16px;
+            color: #9a573c;
+            direction: rtl;
+            text-align: right;
+            width: 200px;
+        }
+        #dialogText {
+            position: absolute;
+            top: 60px;
+            right: 40px;
+            font-family: 'Radio', sans-serif;
+            font-size: 14px;
+            color: #a66c53;
+            direction: rtl;
+            text-align: right;
+            width: 520px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        #fadeOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s;
+            z-index: 999;
+        }
+    </style>
+    <audio id="backgroundMusic" loop>
+        <source src="song/backgroundsong.mp3" type="audio/mpeg">
+    </audio>
+</head>
+<body>
+    <canvas id="gameCanvas" width="1024" height="512"></canvas>
+    <div id="dialogContainer">
+        <img id="dialogBox" src="sprites/dialogue.png" alt="Dialogue Box">
+        <div id="dialogContent">
+            <div id="dialogName"></div>
+            <div id="dialogText"></div>
+        </div>
+    </div>
+    <div id="fadeOverlay"></div>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
