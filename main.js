@@ -20,29 +20,29 @@ const config = {
         gravity: 0.5,
         walkAnimationSpeed: 0.2, // Character walking animation speed
         frameCount: 2, // Assuming 2 frames per animation (e.g., for walking left/right)
-        spriteSheetWidth: 1024, // Assuming the character sprite sheets (melikaleft, melikaright etc.) are 1024x2048
-        spriteSheetHeight: 2048, // Corrected from 1024 to 2048 for 2 vertical frames
-        sourceFrameWidth: 1024, // Source clip width is the full width of one frame
-        sourceFrameHeight: 1024, // Source clip height is the full height of one frame (2048/2)
-        sourceOffsetX: 0, // No offset within the frame as we're taking the whole frame
-        sourceOffsetY: 0, // No offset within the frame as we're taking the whole frame
+        spriteSheetWidth: 1024, // Full width of the sprite sheet
+        spriteSheetHeight: 2048, // Full height of the sprite sheet (2 rows)
+        sourceFrameWidth: 1024, // Width of a single frame within the sheet
+        sourceFrameHeight: 1024, // Height of a single frame within the sheet (2048 / 2)
+        sourceOffsetX: 0, // Offset X to clip the desired part within the frame (0 for entire frame)
+        sourceOffsetY: 0, // Offset Y to clip the desired part within the frame (0 for entire frame)
     },
     elahe: {
         x: 520, y: 255, width: 200, height: 200, // Rendered size
         frameCount: 2,
-        spriteSheetWidth: 1024, // Full width of elahe.png
-        spriteSheetHeight: 2048, // Corrected from 1024 to 2048 for 2 vertical frames
+        spriteSheetWidth: 1024,
+        spriteSheetHeight: 2048,
         animationSpeed: 2,
-        sourceFrameWidth: 1024, // Source clip width is the full width of one frame
-        sourceFrameHeight: 1024, // Source clip height is the full height of one frame (2048/2)
-        sourceOffsetX: 0, // No offset within the frame
-        sourceOffsetY: 0, // No offset within the frame
+        sourceFrameWidth: 1024,
+        sourceFrameHeight: 1024,
+        sourceOffsetX: 0,
+        sourceOffsetY: 0,
     },
     mahsa: {
         x: 320, y: 248, width: 200, height: 200, // Rendered size
         frameCount: 2,
         spriteSheetWidth: 1024,
-        spriteSheetHeight: 2048, // Corrected from 1024 to 2048
+        spriteSheetHeight: 2048,
         animationSpeed: 2,
         sourceFrameWidth: 1024,
         sourceFrameHeight: 1024,
@@ -53,7 +53,7 @@ const config = {
         x: 700, y: 261, width: 181, height: 181, // Rendered size
         frameCount: 2,
         spriteSheetWidth: 1024,
-        spriteSheetHeight: 2048, // Corrected from 1024 to 2048
+        spriteSheetHeight: 2048,
         animationSpeed: 2,
         sourceFrameWidth: 1024,
         sourceFrameHeight: 1024,
@@ -63,13 +63,13 @@ const config = {
     spaceHint: {
         x: 400, y: 100, width: 100, height: 100, // Rendered size
         frameCount: 2, // Assuming 2 frames for animation
-        spriteSheetWidth: 1024, // Full width of space.png
-        spriteSheetHeight: 2048, // Corrected from 1024 to 2048
+        spriteSheetWidth: 1024,
+        spriteSheetHeight: 2048,
         animationSpeed: 2,
-        sourceFrameWidth: 1024, // Source clip width is the full width of one frame
-        sourceFrameHeight: 1024, // Source clip height is the full height of one frame (2048/2)
-        sourceOffsetX: 0, // No offset within the frame
-        sourceOffsetY: 0, // No offset within the frame
+        sourceFrameWidth: 1024,
+        sourceFrameHeight: 1024,
+        sourceOffsetX: 0,
+        sourceOffsetY: 0,
     },
     object: {
         width: 40,  // Rendered width
@@ -409,8 +409,9 @@ function update(timestamp) {
             game.character.direction = 'right';
             game.character.isMoving = true;
         } else {
-            game.character.isMoving = false; // Correctly set to false when no movement keys are pressed
-            game.character.direction = 'idle'; // Set to idle if no movement keys are pressed
+            // Corrected: Set to false and idle when no movement keys are pressed
+            game.character.isMoving = false;
+            game.character.direction = 'idle';
         }
 
         // Character jumping
@@ -526,19 +527,19 @@ function render() {
 
     // Draw NPCs
     // Elahe
-    const elaheFrameHeightInSheet = config.elahe.spriteSheetHeight / config.elahe.frameCount; // This will now be 1024 (2048 / 2)
+    const elaheFrameHeightInSheet = config.elahe.spriteSheetHeight / config.elahe.frameCount;
     const elaheSourceY = Math.floor(game.npcs.elahe.currentFrame) * elaheFrameHeightInSheet + config.elahe.sourceOffsetY;
     drawSprite(game.assets.elahe, config.elahe.x, config.elahe.y, config.elahe.width, config.elahe.height,
                config.elahe.sourceOffsetX, elaheSourceY, config.elahe.sourceFrameWidth, config.elahe.sourceFrameHeight);
 
     // Mahsa
-    const mahsaFrameHeightInSheet = config.mahsa.spriteSheetHeight / config.mahsa.frameCount; // This will now be 1024
+    const mahsaFrameHeightInSheet = config.mahsa.spriteSheetHeight / config.mahsa.frameCount;
     const mahsaSourceY = Math.floor(game.npcs.mahsa.currentFrame) * mahsaFrameHeightInSheet + config.mahsa.sourceOffsetY;
     drawSprite(game.assets.mahsa, config.mahsa.x, config.mahsa.y, config.mahsa.width, config.mahsa.height,
                config.mahsa.sourceOffsetX, mahsaSourceY, config.mahsa.sourceFrameWidth, config.mahsa.sourceFrameHeight);
 
     // Sohrab
-    const sohrabFrameHeightInSheet = config.sohrab.spriteSheetHeight / config.sohrab.frameCount; // This will now be 1024
+    const sohrabFrameHeightInSheet = config.sohrab.spriteSheetHeight / config.sohrab.frameCount;
     const sohrabSourceY = Math.floor(game.npcs.sohrab.currentFrame) * sohrabFrameHeightInSheet + config.sohrab.sourceOffsetY;
     drawSprite(game.assets.sohrab, config.sohrab.x, config.sohrab.y, config.sohrab.width, config.sohrab.height,
                config.sohrab.sourceOffsetX, sohrabSourceY, config.sohrab.sourceFrameWidth, config.sohrab.sourceFrameHeight);
@@ -548,13 +549,14 @@ function render() {
     game.items.forEach(item => {
         if (!item.collected && game.assets.object && game.assets.object.complete) {
             // Draw object - relying on the image's own dimensions for source, and config for destination size
+            // For objects that are not sprite sheets, source parameters default to asset's full dimensions.
             drawSprite(game.assets.object, item.x, item.y, config.object.width, config.object.height);
         }
     });
 
     // Draw Space Hint (if active)
     if (game.spaceHintActive && game.assets.space && game.assets.space.complete) {
-        const spaceHintFrameHeightInSheet = config.spaceHint.spriteSheetHeight / config.spaceHint.frameCount; // This will now be 1024
+        const spaceHintFrameHeightInSheet = config.spaceHint.spriteSheetHeight / config.spaceHint.frameCount;
         const spaceHintSourceY = Math.floor(game.spaceHintCurrentFrame) * spaceHintFrameHeightInSheet + config.spaceHint.sourceOffsetY;
         drawSprite(game.assets.space, config.spaceHint.x, config.spaceHint.y, config.spaceHint.width, config.spaceHint.height,
                    config.spaceHint.sourceOffsetX, spaceHintSourceY, config.spaceHint.sourceFrameWidth, config.spaceHint.sourceFrameHeight);
